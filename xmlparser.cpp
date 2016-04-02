@@ -19,9 +19,12 @@ XMLparser::XMLparser()
 bool XMLparser::parseXML(QXmlStreamReader* _xml, QUrl* _url, QSqlQuery* _query)
 {
     QString title;
+    QString category;
     QString content;
     QString date;
     QString link;
+    QString channelTitle;
+    QString prevTag;
 
     while (!_xml->atEnd())
     {
@@ -29,20 +32,34 @@ bool XMLparser::parseXML(QXmlStreamReader* _xml, QUrl* _url, QSqlQuery* _query)
         if (_xml->isStartElement())
         {
             currentTag = _xml->name().toString();
+            if (currentTag == "channel")
+            {
+                prevTag = currentTag;
+                continue;
+            }
         }
         else if (_xml->isEndElement())
         {
             if (_xml->name() == "item")
             {
-                Feed feed(title, content, date, link);
+                Feed feed(title, category, content, date, link);
                 feeds.append(feed);
             }
         }
         else if (_xml->isCharacters() && !_xml->isWhitespace())
         {
-            if (currentTag == "title")
+            if (currentTag == "title" && prevTag == "channel")
+            {
+                channelTitle = _xml->text().toString();
+                prevTag = "";
+            }
+            else if (currentTag == "title")
             {
                 title = _xml->text().toString();
+            }
+            else if (currentTag == "category")
+            {
+                category = _xml->text().toString();
             }
             else if (currentTag == "description")
             {
@@ -66,9 +83,11 @@ bool XMLparser::parseXML(QXmlStreamReader* _xml, QUrl* _url, QSqlQuery* _query)
 
     foreach (Feed feed, feeds)
     {
-        _query->prepare("INSERT INTO Feed (url, title, content, date, link) VALUES (:stringUrl, :stringTitle, :stringContent, DATETIME(:stringDate), :stringLink)");
+        _query->prepare("INSERT INTO Feed (name, url, title, category, content, date, link) VALUES (:stringName, :stringUrl, :stringTitle, :stringCategory, :stringContent, DATETIME(:stringDate), :stringLink)");
+        _query->bindValue(":stringName", channelTitle.trimmed());
         _query->bindValue(":stringUrl", _url->toString());
         _query->bindValue(":stringTitle", feed.getTitle().trimmed());
+        _query->bindValue(":stringCategory", feed.getCategory().trimmed());
         _query->bindValue(":stringContent", feed.getContent().trimmed());
         _query->bindValue(":stringDate", feed.getDate().trimmed());
         _query->bindValue(":stringLink", feed.getLink().trimmed());

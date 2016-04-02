@@ -1,13 +1,11 @@
 #include "feed.h"
 
-Feed::Feed()
-{
+Feed::Feed() {}
 
-}
-
-Feed::Feed(QString _title, QString _content, QString _date, QString _link)
+Feed::Feed(QString _title, QString _category, QString _content, QString _date, QString _link)
 {
     title = _title;
+    category = _category;
     content = _content;
     date = _date;
     link = _link;
@@ -16,6 +14,11 @@ Feed::Feed(QString _title, QString _content, QString _date, QString _link)
 QString Feed::getTitle()
 {
     return title;
+}
+
+QString Feed::getCategory()
+{
+    return category;
 }
 
 QString Feed::getContent()
@@ -36,6 +39,11 @@ QString Feed::getLink()
 void Feed::setTitle(QString _title)
 {
     title = _title;
+}
+
+void Feed::setCategory(QString _category)
+{
+    category = _category;
 }
 
 void Feed::setContent(QString _content)

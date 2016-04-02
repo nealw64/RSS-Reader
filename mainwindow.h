@@ -7,6 +7,7 @@
 #include <QTreeWidget>
 #include <QVBoxLayout>
 #include <QtSql>
+#include <QtWidgets>
 #include "searchdialog.h"
 #include "xmlparser.h"
 #include "filedownloader.h"
@@ -22,17 +23,19 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    void setUpDatabase();
+    void setupDatabase();
 
 signals:
     void feedFound();
+    void readyForUpdate();
 
 private slots:
     void addFeedsToDatabase();
-    void updateInfo();
+    void updateChannelInfo();
     void on_actionAdd_triggered();
     void on_actionExit_triggered();
-    void onTreeWidgetItem_clicked(QTreeWidgetItem* item);
+    void onChannelItem_clicked(QTreeWidgetItem* item);
+    void onFeedItem_clicked(QTreeWidgetItem* item);
     void onRSSLink_clicked(QUrl url);
 
 private:
@@ -43,9 +46,12 @@ private:
     QXmlStreamReader* xmlReader;
     QUrl* url;
     QVBoxLayout* vBoxLayout;
-    QTreeWidget* treeWidget;
+    QHBoxLayout* hBoxLayout;
+    QTreeWidget* feedTreeWidget;
+    QTreeWidget* channelTreeWidget;
     QTextBrowser* feedBrowser;
-    QWidget* window;
+    QWidget* feedPanel;
+    QWidget* mainPanel;
 };
 
 #endif // MAINWINDOW_H
