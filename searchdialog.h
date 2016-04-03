@@ -2,6 +2,7 @@
 #define SEARCHDIALOG_H
 
 #include <QDialog>
+#include <QProgressDialog>
 #include <QGridLayout>
 #include <QLineEdit>
 #include <QPushButton>
@@ -12,25 +13,31 @@
 
 class SearchDialog : public QDialog
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     SearchDialog(QWidget *parent = 0);
-    QUrl* getFeedUrl();
+    ~SearchDialog();
+    QUrl getFeedUrl();
     QByteArray getDownloadedData();
 
 signals:
-    void feedFound();
+    void validUrl();
 
 private slots:
     void searchFeed();
+    void updateDownloadProgress(qint64, qint64);
+    void accepted();
+    void isValidUrl();
 
 private:
-    QString query;
     QLineEdit* searchInput;
     QPushButton* searchButton;
-    QUrl* feedUrl;
-    QGridLayout* layout;
-    FileDownloader* fileDownloader;
+    QLabel* messageLabel;
+    QGridLayout* gridLayout;
+    QProgressDialog* progressDialog;
+    QString query;
+    QUrl feedUrl;
+    FileDownloader fileDownloader;
 };
 
 #endif // SEARCHDIALOG_H

@@ -55,6 +55,17 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete query;
+    delete xmlParser;
+    delete xmlReader;
+    delete url;
+    delete vBoxLayout;
+    delete hBoxLayout;
+    delete feedTreeWidget;
+    delete channelTreeWidget;
+    delete feedBrowser;
+    delete feedPanel;
+    delete mainPanel;
 }
 
 void MainWindow::setupDatabase()
@@ -146,7 +157,7 @@ void MainWindow::on_actionAdd_triggered()
     SearchDialog searchDialog(this);
     if (searchDialog.exec() == QDialog::Accepted)
     {
-       url = searchDialog.getFeedUrl();
+       *url = searchDialog.getFeedUrl();
        xmlReader->addData(searchDialog.getDownloadedData());
        emit feedFound();
     }
