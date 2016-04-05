@@ -32,3 +32,5 @@ HEADERS  += mainwindow.h \
     searchdialog.h
 
 FORMS    += mainwindow.ui
+
+RESOURCES = images.qrc

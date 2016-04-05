@@ -28,6 +28,7 @@
      <string>Feed</string>
     </property>
     <addaction name="actionAdd"/>
+    <addaction name="actionUpdate"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -46,6 +47,11 @@
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionUpdate">
+   <property name="text">
+    <string>Update</string>
    </property>
   </action>
  </widget>

@@ -27,7 +27,6 @@ SearchDialog::~SearchDialog()
     delete searchButton;
     delete messageLabel;
     delete gridLayout;
-    delete progressDialog;
 }
 
 void SearchDialog::isValidUrl()
@@ -76,5 +75,6 @@ void SearchDialog::updateDownloadProgress(qint64 bytesRead, qint64 totalBytes)
 void SearchDialog::accepted()
 {
     progressDialog->close();
+    delete progressDialog;
     accept();
 }

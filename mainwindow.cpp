@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowTitle(tr("RSS-Reader"));
+    this->setWindowIcon(QIcon(":/img/windowIcon.png"));
     this->setMinimumSize(1200, 900);
 
     url = new QUrl;
@@ -27,10 +28,14 @@ MainWindow::MainWindow(QWidget *parent) :
     stringList.push_back("Date");
     feedTreeWidget->setHeaderLabels(stringList);
     feedTreeWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    feedTreeWidget->setSortingEnabled(true);
+    feedTreeWidget->sortItems(2, Qt::DescendingOrder);
 
     channelTreeWidget->setColumnCount(1);
     channelTreeWidget->setHeaderLabel("Channel");
     channelTreeWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    channelTreeWidget->setSortingEnabled(true);
+    channelTreeWidget->sortItems(0, Qt::AscendingOrder);
 
     vBoxLayout = new QVBoxLayout;
     vBoxLayout->addWidget(feedTreeWidget);
@@ -79,16 +84,23 @@ void MainWindow::setupDatabase()
         exit(0);
     }
     query = new QSqlQuery;
-    query->exec("CREATE TABLE IF NOT EXISTS Feed (name VARCHAR, url VARCHAR, title VARCHAR UNIQUE NOT NULL, category VARCHAR, content VARCHAR, date DATETIME, link VARCHAR, CONSTRAINT Feed PRIMARY KEY (title))");
+    request = "CREATE TABLE IF NOT EXISTS Feed (name VARCHAR, url VARCHAR, title VARCHAR UNIQUE NOT NULL, category VARCHAR, content VARCHAR, date DATETIME, link VARCHAR, CONSTRAINT Feed PRIMARY KEY (title))";
+    query->exec(request);
+}
+
+void MainWindow::parseXml()
+{
+    if (!xmlParser->parseXML(xmlReader, url, query))
+    {
+        qDebug() << xmlReader->errorString() << endl;
+        exit(0);
+    }
+    xmlReader->clear();
 }
 
 void MainWindow::addFeedsToDatabase()
 {
-    if (!xmlParser->parseXML(xmlReader, url, query))
-    {
-        exit(0);
-    }
-    xmlReader->clear();
+    parseXml();
     emit readyForUpdate();
 }
 
@@ -96,7 +108,8 @@ void MainWindow::updateChannelInfo()
 {
     channelTreeWidget->clear();
     query->clear();
-    query->exec("SELECT DISTINCT name FROM Feed");
+    request = "SELECT DISTINCT name FROM Feed";
+    query->exec(request);
     QSqlRecord rec = query->record();
     while (query->next())
     {
@@ -112,7 +125,7 @@ void MainWindow::onChannelItem_clicked(QTreeWidgetItem *item)
     feedTreeWidget->clear();
     query->clear();
     url->setUrl(item->text(0));
-    QString request = "SELECT * FROM Feed WHERE name LIKE '%" + item->text(0) + "%'";
+    request = "SELECT * FROM Feed WHERE name LIKE '%" + item->text(0) + "%'";
     query->exec(request);
     QSqlRecord rec = query->record();
     while (query->next())
@@ -134,7 +147,7 @@ void MainWindow::onFeedItem_clicked(QTreeWidgetItem* item)
     feedBrowser->clear();
     query->clear();
     QTextEdit output;
-    QString request = "SELECT * FROM Feed WHERE title LIKE '%" + item->text(0).replace("'", "''") + "%'";
+    request = "SELECT * FROM Feed WHERE title LIKE '%" + item->text(0).replace("'", "''") + "%'";
     query->exec(request);
     QSqlRecord rec = query->record();
     while (query->next())
@@ -161,6 +174,11 @@ void MainWindow::on_actionAdd_triggered()
        xmlReader->addData(searchDialog.getDownloadedData());
        emit feedFound();
     }
+}
+
+void MainWindow::on_actionUpdate_triggered()
+{
+
 }
 
 void MainWindow::on_actionExit_triggered()

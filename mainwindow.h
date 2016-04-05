@@ -24,6 +24,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void setupDatabase();
+    void parseXml();
 
 signals:
     void feedFound();
@@ -37,6 +38,7 @@ private slots:
     void onChannelItem_clicked(QTreeWidgetItem* item);
     void onFeedItem_clicked(QTreeWidgetItem* item);
     void onRSSLink_clicked(QUrl url);
+    void on_actionUpdate_triggered();
 
 private:
     Ui::MainWindow* ui;
@@ -52,6 +54,7 @@ private:
     QTextBrowser* feedBrowser;
     QWidget* feedPanel;
     QWidget* mainPanel;
+    QString request;
 };
 
 #endif // MAINWINDOW_H
