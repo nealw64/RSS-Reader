@@ -7,17 +7,20 @@ class FileDownloader: public QObject
 {
     Q_OBJECT
 public:
-    explicit FileDownloader(QObject* parent = 0);
+    explicit FileDownloader(QObject *parent = 0);
     ~FileDownloader();
     QByteArray getDownloadedData() const;
     void downloadData(QUrl url);
+
 signals:
     void downloaded();
     void downloadProgress(qint64, qint64);
+
 private slots:
-    void fileDownloaded(QNetworkReply* reply);
+    void fileDownloaded(QNetworkReply *reply);
+
 private:
-    QNetworkAccessManager* netManager;
+    QNetworkAccessManager *netManager;
     QByteArray downloadedData;
 };
 

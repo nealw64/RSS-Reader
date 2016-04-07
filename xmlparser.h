@@ -6,11 +6,11 @@
 #include <QUrl>
 #include <feed.h>
 
-class XMLparser
+class XmlParser
 {
 public:
-    XMLparser();
-    bool parseXML(QXmlStreamReader *_xml, QUrl* _url, QSqlQuery* _query);
+    XmlParser();
+    bool parseXml(QXmlStreamReader *xml, QUrl* url, QSqlQuery* query);
     QString extractAndParseDate(QString pubDate);
     QString extractAndParseDescription(QString description);
 

@@ -15,11 +15,11 @@ public:
     QString getDate();
     QString getLink();
 
-    void setTitle(QString _title);
-    void setContent(QString _content);
-    void setCategory(QString _category);
-    void setDate(QString _date);
-    void setLink(QString _link);
+    void setTitle(QString title);
+    void setContent(QString content);
+    void setCategory(QString category);
+    void setDate(QString date);
+    void setLink(QString link);
 
 private:
     QString title;

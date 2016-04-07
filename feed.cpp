@@ -2,13 +2,13 @@
 
 Feed::Feed() {}
 
-Feed::Feed(QString _title, QString _category, QString _content, QString _date, QString _link)
+Feed::Feed(QString title, QString category, QString content, QString date, QString link)
 {
-    title = _title;
-    category = _category;
-    content = _content;
-    date = _date;
-    link = _link;
+    this->title = title;
+    this->category = category;
+    this->content = content;
+    this->date = date;
+    this->link = link;
 }
 
 QString Feed::getTitle()
@@ -36,27 +36,27 @@ QString Feed::getLink()
     return link;
 }
 
-void Feed::setTitle(QString _title)
+void Feed::setTitle(QString title)
 {
-    title = _title;
+    this->title = title;
 }
 
-void Feed::setCategory(QString _category)
+void Feed::setCategory(QString category)
 {
-    category = _category;
+    this->category = category;
 }
 
-void Feed::setContent(QString _content)
+void Feed::setContent(QString content)
 {
-    content = _content;
+    this->content = content;
 }
 
-void Feed::setDate(QString _date)
+void Feed::setDate(QString date)
 {
-    date = _date;
+    this->date = date;
 }
 
-void Feed::setLink(QString _link)
+void Feed::setLink(QString link)
 {
-    link = _link;
+    this->link = link;
 }

@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setMinimumSize(1200, 900);
 
     url = new QUrl;
-    xmlParser = new XMLparser;
+    xmlParser = new XmlParser;
     xmlReader = new QXmlStreamReader;
     feedTreeWidget = new QTreeWidget;
     channelTreeWidget = new QTreeWidget;
@@ -50,15 +50,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(this, SIGNAL(feedFound()), this, SLOT(addFeedsToDatabase()));
     connect(this, SIGNAL(readyForUpdate()), this, SLOT(updateChannelInfo()));
-    connect(channelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(onChannelItem_clicked(QTreeWidgetItem*)));
-    connect(feedTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this, SLOT(onFeedItem_clicked(QTreeWidgetItem*)));
+    connect(channelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this,
+            SLOT(onChannelItem_clicked(QTreeWidgetItem*)));
+    connect(feedTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*,int)), this,
+            SLOT(onFeedItem_clicked(QTreeWidgetItem*)));
     connect(feedBrowser, SIGNAL(anchorClicked(QUrl)), this, SLOT(onRSSLink_clicked(QUrl)));
-    setupDatabase();
+    this->setupDatabase();
     emit readyForUpdate();
 }
 
 MainWindow::~MainWindow()
 {
+    database.close();
     delete ui;
     delete query;
     delete xmlParser;
@@ -84,13 +87,15 @@ void MainWindow::setupDatabase()
         exit(0);
     }
     query = new QSqlQuery;
-    request = "CREATE TABLE IF NOT EXISTS Feed (name VARCHAR, url VARCHAR, title VARCHAR UNIQUE NOT NULL, category VARCHAR, content VARCHAR, date DATETIME, link VARCHAR, CONSTRAINT Feed PRIMARY KEY (title))";
+    request = "CREATE TABLE IF NOT EXISTS Feed (name VARCHAR, url VARCHAR,"
+              "title VARCHAR UNIQUE NOT NULL, category VARCHAR, content VARCHAR, date DATETIME,"
+              "link VARCHAR, CONSTRAINT Feed PRIMARY KEY (title))";
     query->exec(request);
 }
 
 void MainWindow::parseXml()
 {
-    if (!xmlParser->parseXML(xmlReader, url, query))
+    if (!xmlParser->parseXml(xmlReader, url, query))
     {
         qDebug() << xmlReader->errorString() << endl;
         exit(0);
@@ -113,7 +118,7 @@ void MainWindow::updateChannelInfo()
     QSqlRecord rec = query->record();
     while (query->next())
     {
-        QTreeWidgetItem* channelTreeWidgetItem = new QTreeWidgetItem;
+        QTreeWidgetItem *channelTreeWidgetItem = new QTreeWidgetItem;
         channelTreeWidgetItem->setText(0, query->value(rec.indexOf("name")).toString());
         channelTreeWidget->addTopLevelItem(channelTreeWidgetItem);
     }
@@ -128,8 +133,7 @@ void MainWindow::onChannelItem_clicked(QTreeWidgetItem *item)
     request = "SELECT * FROM Feed WHERE name LIKE '%" + item->text(0) + "%'";
     query->exec(request);
     QSqlRecord rec = query->record();
-    while (query->next())
-    {
+    while (query->next()) {
         QTreeWidgetItem* feedTreeWidgetItem = new QTreeWidgetItem;
         feedTreeWidgetItem->setText(0, query->value(rec.indexOf("title")).toString());
         feedTreeWidgetItem->setText(1, query->value(rec.indexOf("category")).toString());
@@ -142,7 +146,7 @@ void MainWindow::onChannelItem_clicked(QTreeWidgetItem *item)
     }
 }
 
-void MainWindow::onFeedItem_clicked(QTreeWidgetItem* item)
+void MainWindow::onFeedItem_clicked(QTreeWidgetItem *item)
 {
     feedBrowser->clear();
     query->clear();
@@ -150,12 +154,12 @@ void MainWindow::onFeedItem_clicked(QTreeWidgetItem* item)
     request = "SELECT * FROM Feed WHERE title LIKE '%" + item->text(0).replace("'", "''") + "%'";
     query->exec(request);
     QSqlRecord rec = query->record();
-    while (query->next())
-    {
+    while (query->next()) {
         output.append(query->value(rec.indexOf("title")).toString());
         output.append(query->value(rec.indexOf("date")).toString());
         output.append(query->value(rec.indexOf("content")).toString());
-        output.append("<a href='" + (query->value(rec.indexOf("link")).toString() + "'>" + tr("Read more here") + "</a>"));
+        output.append("<a href='" + (query->value(rec.indexOf("link")).toString() + "'>"
+                                     + tr("Read more here") + "</a>"));
     }
     feedBrowser->setHtml(output.toHtml());
 }
@@ -168,11 +172,10 @@ void MainWindow::onRSSLink_clicked(QUrl url)
 void MainWindow::on_actionAdd_triggered()
 {
     SearchDialog searchDialog(this);
-    if (searchDialog.exec() == QDialog::Accepted)
-    {
-       *url = searchDialog.getFeedUrl();
-       xmlReader->addData(searchDialog.getDownloadedData());
-       emit feedFound();
+    if (searchDialog.exec() == QDialog::Accepted) {
+        *url = searchDialog.getFeedUrl();
+        xmlReader->addData(searchDialog.getDownloadedData());
+        emit feedFound();
     }
 }
 

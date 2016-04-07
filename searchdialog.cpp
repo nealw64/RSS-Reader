@@ -31,13 +31,14 @@ SearchDialog::~SearchDialog()
 
 void SearchDialog::isValidUrl()
 {
-    QRegExp validUrlRegex("^(http|https|ftp):\\/\\/[a-z0-9]+([-.]{1}[a-z0-9]+)*.[a-z]{2,5}(([0-9]{1,5})?\\/?.*)$");
+    QString regex;
+    regex = "^(http|https|ftp):\\/\\/[a-z0-9]+([-.]{1}[a-z0-9]+)*.[a-z]{2,5}(([0-9]{1,5})?\\/?.*)$";
+    QRegExp validUrlRegex(regex);
 
-    if (validUrlRegex.exactMatch(searchInput->text())){
+    if (validUrlRegex.exactMatch(searchInput->text())) {
         messageLabel->setText(tr("All right. URL is valid."));
         emit validUrl();
-    }
-    else {
+    } else {
         messageLabel->setText(tr("Invalid URL"));
     }
 }
@@ -63,7 +64,8 @@ void SearchDialog::searchFeed()
     progressDialog->show();
     fileDownloader.downloadData(url);
 
-    connect(&fileDownloader, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(updateDownloadProgress(qint64, qint64)));
+    connect(&fileDownloader, SIGNAL(downloadProgress(qint64, qint64)), this,
+            SLOT(updateDownloadProgress(qint64, qint64)));
 }
 
 void SearchDialog::updateDownloadProgress(qint64 bytesRead, qint64 totalBytes)

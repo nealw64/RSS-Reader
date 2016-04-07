@@ -1,9 +1,10 @@
 #include "filedownloader.h"
 
-FileDownloader::FileDownloader(QObject* parent): QObject(parent)
+FileDownloader::FileDownloader(QObject *parent): QObject(parent)
 {
     netManager = new QNetworkAccessManager;
-    connect(netManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(fileDownloaded(QNetworkReply*)));
+    connect(netManager, SIGNAL(finished(QNetworkReply*)), this,
+            SLOT(fileDownloaded(QNetworkReply*)));
 }
 
 FileDownloader::~FileDownloader()
@@ -14,18 +15,16 @@ FileDownloader::~FileDownloader()
 void FileDownloader::downloadData(QUrl url)
 {
     QNetworkRequest request(url);
-    connect(netManager->get(request), SIGNAL(downloadProgress(qint64,qint64)), SIGNAL(downloadProgress(qint64,qint64)));
+    connect(netManager->get(request), SIGNAL(downloadProgress(qint64, qint64)),
+            SIGNAL(downloadProgress(qint64, qint64)));
 }
 
 void FileDownloader::fileDownloaded(QNetworkReply *reply)
 {
-    if (reply->error())
-    {
+    if (reply->error()) {
         qDebug() << "ERROR";
         qDebug() << reply->errorString();
-    }
-    else
-    {
+    } else {
         downloadedData = reply->readAll();
         emit downloaded();
     }

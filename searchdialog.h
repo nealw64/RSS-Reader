@@ -30,11 +30,11 @@ private slots:
     void isValidUrl();
 
 private:
-    QLineEdit* searchInput;
-    QPushButton* searchButton;
-    QLabel* messageLabel;
-    QGridLayout* gridLayout;
-    QProgressDialog* progressDialog;
+    QLineEdit *searchInput;
+    QPushButton *searchButton;
+    QLabel *messageLabel;
+    QGridLayout *gridLayout;
+    QProgressDialog *progressDialog;
     QString query;
     QUrl feedUrl;
     FileDownloader fileDownloader;

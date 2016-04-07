@@ -35,25 +35,25 @@ private slots:
     void updateChannelInfo();
     void on_actionAdd_triggered();
     void on_actionExit_triggered();
-    void onChannelItem_clicked(QTreeWidgetItem* item);
-    void onFeedItem_clicked(QTreeWidgetItem* item);
+    void onChannelItem_clicked(QTreeWidgetItem *item);
+    void onFeedItem_clicked(QTreeWidgetItem *item);
     void onRSSLink_clicked(QUrl url);
     void on_actionUpdate_triggered();
 
 private:
-    Ui::MainWindow* ui;
+    Ui::MainWindow *ui;
     QSqlDatabase database;
-    QSqlQuery* query;
-    XMLparser* xmlParser;
-    QXmlStreamReader* xmlReader;
-    QUrl* url;
-    QVBoxLayout* vBoxLayout;
-    QHBoxLayout* hBoxLayout;
-    QTreeWidget* feedTreeWidget;
-    QTreeWidget* channelTreeWidget;
-    QTextBrowser* feedBrowser;
-    QWidget* feedPanel;
-    QWidget* mainPanel;
+    QSqlQuery *query;
+    XmlParser *xmlParser;
+    QXmlStreamReader *xmlReader;
+    QUrl *url;
+    QVBoxLayout *vBoxLayout;
+    QHBoxLayout *hBoxLayout;
+    QTreeWidget *feedTreeWidget;
+    QTreeWidget *channelTreeWidget;
+    QTextBrowser *feedBrowser;
+    QWidget *feedPanel;
+    QWidget *mainPanel;
     QString request;
 };
 
