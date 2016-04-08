@@ -28,11 +28,17 @@ public:
 
 signals:
     void feedFound();
+    void getFeed();
     void readyForUpdate();
+    void setUrlForDownload();
 
 private slots:
+    void setUrlForDownloading();
+    void downloadFeed();
+    void feedIsDownloaded();
     void addFeedsToDatabase();
     void updateChannelInfo();
+    void updateFeedsInfo();
     void on_actionAdd_triggered();
     void on_actionExit_triggered();
     void onChannelItem_clicked(QTreeWidgetItem *item);
@@ -55,6 +61,9 @@ private:
     QWidget *feedPanel;
     QWidget *mainPanel;
     QString request;
+    QString currentChannelName;
+    QStringList urlForUpdate;
+    FileDownloader *fileDownloader;
 };
 
 #endif // MAINWINDOW_H

@@ -14,9 +14,11 @@ FileDownloader::~FileDownloader()
 
 void FileDownloader::downloadData(QUrl url)
 {
+    downloadedData.clear();
     QNetworkRequest request(url);
-    connect(netManager->get(request), SIGNAL(downloadProgress(qint64, qint64)),
-            SIGNAL(downloadProgress(qint64, qint64)));
+    netManager->get(request);
+//    connect(netManager->get(request), SIGNAL(downloadProgress(qint64, qint64)),
+//            SIGNAL(downloadProgress(qint64, qint64)));
 }
 
 void FileDownloader::fileDownloaded(QNetworkReply *reply)
@@ -26,6 +28,7 @@ void FileDownloader::fileDownloaded(QNetworkReply *reply)
         qDebug() << reply->errorString();
     } else {
         downloadedData = reply->readAll();
+        reply->deleteLater();
         emit downloaded();
     }
 }
