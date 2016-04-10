@@ -10,7 +10,10 @@ public:
     explicit FileDownloader(QObject *parent = 0);
     ~FileDownloader();
     QByteArray getDownloadedData() const;
-    void downloadData(QUrl url);
+    void downloadData();
+    void addUrlForDownload(QUrl url);
+    QString getCurrentUrl();
+    bool isUrlForDownloadEmpty();
 
 signals:
     void downloaded();
@@ -22,6 +25,7 @@ private slots:
 private:
     QNetworkAccessManager *netManager;
     QByteArray downloadedData;
+    QStringList urlForDownload;
 };
 
 #endif // FILEDOWNLOADER_H

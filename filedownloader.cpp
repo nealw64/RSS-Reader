@@ -12,13 +12,29 @@ FileDownloader::~FileDownloader()
     delete netManager;
 }
 
-void FileDownloader::downloadData(QUrl url)
+void FileDownloader::downloadData()
 {
     downloadedData.clear();
+    QUrl url(urlForDownload.first());
     QNetworkRequest request(url);
-    netManager->get(request);
-//    connect(netManager->get(request), SIGNAL(downloadProgress(qint64, qint64)),
-//            SIGNAL(downloadProgress(qint64, qint64)));
+    QNetworkReply* reply = netManager->get(request);
+    connect(reply, SIGNAL(downloadProgress(qint64, qint64)),
+            SIGNAL(downloadProgress(qint64, qint64)));
+}
+
+void FileDownloader::addUrlForDownload(QUrl url)
+{
+    urlForDownload.append(url.toString());
+}
+
+bool FileDownloader::isUrlForDownloadEmpty()
+{
+    return urlForDownload.isEmpty();
+}
+
+QString FileDownloader::getCurrentUrl()
+{
+    return urlForDownload.takeFirst();
 }
 
 void FileDownloader::fileDownloaded(QNetworkReply *reply)

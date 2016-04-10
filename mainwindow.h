@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QWebView>
 #include <QTextBrowser>
 #include <QTreeWidget>
 #include <QVBoxLayout>
@@ -30,21 +29,22 @@ signals:
     void feedFound();
     void getFeed();
     void readyForUpdate();
-    void setUrlForDownload();
+    void checkUrlForDownload();
 
 private slots:
-    void setUrlForDownloading();
+    void checkUrlForDownloading();
     void downloadFeed();
     void feedIsDownloaded();
     void addFeedsToDatabase();
     void updateChannelInfo();
     void updateFeedsInfo();
-    void on_actionAdd_triggered();
+    void on_actionAdd_triggered();  
+    void on_actionDelete_triggered();
     void on_actionExit_triggered();
+    void on_actionUpdate_triggered();
     void onChannelItem_clicked(QTreeWidgetItem *item);
     void onFeedItem_clicked(QTreeWidgetItem *item);
     void onRSSLink_clicked(QUrl url);
-    void on_actionUpdate_triggered();
 
 private:
     Ui::MainWindow *ui;
@@ -62,8 +62,9 @@ private:
     QWidget *mainPanel;
     QString request;
     QString currentChannelName;
-    QStringList urlForUpdate;
     FileDownloader *fileDownloader;
+    QTimer *timer;
+    const int UPDATE_FREQUENCY;
 };
 
 #endif // MAINWINDOW_H

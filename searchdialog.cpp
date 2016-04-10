@@ -14,9 +14,10 @@ SearchDialog::SearchDialog(QWidget *parent) :
     gridLayout->addWidget(searchButton, 0, 1);
     gridLayout->addWidget(messageLabel);
     setLayout(gridLayout);
-    setMinimumSize(500, 60);
+    setMinimumSize(400, 60);
 
     connect(searchButton, SIGNAL(clicked(bool)), this, SLOT(isValidUrl()));
+    connect(searchInput, SIGNAL(returnPressed()), this, SLOT(isValidUrl()));
     connect(this, SIGNAL(validUrl()), this, SLOT(searchFeed()));
     connect(&fileDownloader, SIGNAL(downloaded()), this, SLOT(accepted()));
 }
@@ -34,7 +35,6 @@ void SearchDialog::isValidUrl()
     QString regex;
     regex = "^(http|https|ftp):\\/\\/[a-z0-9]+([-.]{1}[a-z0-9]+)*.[a-z]{2,5}(([0-9]{1,5})?\\/?.*)$";
     QRegExp validUrlRegex(regex);
-
     if (validUrlRegex.exactMatch(searchInput->text())) {
         messageLabel->setText(tr("All right. URL is valid."));
         emit validUrl();
@@ -60,9 +60,9 @@ void SearchDialog::searchFeed()
     progressDialog->setWindowModality(Qt::WindowModal);
 
     feedUrl.setUrl(searchInput->text());
-    QUrl url(searchInput->text());
+    fileDownloader.addUrlForDownload(feedUrl);
     progressDialog->show();
-    fileDownloader.downloadData(url);
+    fileDownloader.downloadData();
 
     connect(&fileDownloader, SIGNAL(downloadProgress(qint64, qint64)), this,
             SLOT(updateDownloadProgress(qint64, qint64)));

@@ -29,6 +29,7 @@
     </property>
     <addaction name="actionAdd"/>
     <addaction name="actionUpdate"/>
+    <addaction name="actionDelete"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -52,6 +53,11 @@
   <action name="actionUpdate">
    <property name="text">
     <string>Update</string>
+   </property>
+  </action>
+  <action name="actionDelete">
+   <property name="text">
+    <string>Delete</string>
    </property>
   </action>
  </widget>

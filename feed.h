@@ -7,7 +7,7 @@ class Feed
 {
 public:
     Feed();
-    Feed(QString _title, QString _category, QString _content, QString _date, QString _link);
+    Feed(QString title, QString category, QString content, QString date, QString link);
 
     QString getTitle();
     QString getCategory();
