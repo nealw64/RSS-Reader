@@ -17,8 +17,7 @@ void FileDownloader::downloadData()
     downloadedData.clear();
     QUrl url(urlForDownload.first());
     QNetworkRequest request(url);
-    QNetworkReply* reply = netManager->get(request);
-    connect(reply, SIGNAL(downloadProgress(qint64, qint64)),
+    connect(netManager->get(request), SIGNAL(downloadProgress(qint64, qint64)),
             SIGNAL(downloadProgress(qint64, qint64)));
 }
 

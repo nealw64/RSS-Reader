@@ -91,19 +91,35 @@ QString XmlParser::extractAndParseDate(QString pubDate)
 
 QString XmlParser::extractAndParseDescription(QString description)
 {
-    int indexFirst = 0, indexLast = 0;
-    QString currentExp;
-    while (true) {
-        currentExp = "<";
-        indexFirst = description.indexOf(currentExp);
-        currentExp = ">";
-        indexLast = description.indexOf(currentExp);
-        if (indexFirst != -1 && indexLast != -1) {
-            int length = indexLast + currentExp.length() - indexFirst;
-            description.remove(indexFirst, length);
+    QStringList currentExp;
+    currentExp.append("<p><a");
+    currentExp.append("</a></p>");
+    currentExp.append("<br");
+    currentExp.append("/>");
+    while (!currentExp.isEmpty()) {
+        if (removeCurrentExp(&description, currentExp)) {
+            continue;
         } else {
-            break;
+            currentExp.removeFirst();
+            currentExp.removeFirst();
         }
     }
     return description;
+}
+
+bool XmlParser::removeCurrentExp(QString *description, QStringList currentExp)
+{
+    int indexFirst = 0, indexLast = 0;
+    indexFirst = description->indexOf(currentExp[0]);
+    if (currentExp[1] != "/>") {
+      indexLast = description->indexOf(currentExp[1]);
+    } else {
+      indexLast = description->lastIndexOf(currentExp[1]);
+    }
+    if (indexFirst != -1 && indexLast != -1) {
+        int length = indexLast + currentExp[1].length() - indexFirst;
+        description->remove(indexFirst, length);
+        return true;
+    }
+    return false;
 }
