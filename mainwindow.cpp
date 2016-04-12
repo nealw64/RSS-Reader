@@ -123,7 +123,6 @@ void MainWindow::checkUrlForDownloading()
         request = "SELECT title, category, date FROM Feed WHERE name LIKE '%"
                 + currentChannelName + "%'";
         updateFeedsInfo();
-        feedTreeWidget->sortItems(2, Qt::DescendingOrder);
         return;
     }
     emit getFeed();
@@ -145,6 +144,7 @@ void MainWindow::feedIsDownloaded()
 
 void MainWindow::updateChannelInfo()
 {
+    query->clear();
     channelTreeWidget->clear();
     request = "SELECT DISTINCT name FROM Feed";
     query->exec(request);
@@ -159,6 +159,7 @@ void MainWindow::updateChannelInfo()
 
 void MainWindow::updateFeedsInfo()
 {
+    query->clear();
     feedTreeWidget->clear();
     query->exec(request);
     QSqlRecord rec = query->record();
@@ -186,6 +187,7 @@ void MainWindow::onChannelItem_clicked(QTreeWidgetItem *item)
 
 void MainWindow::onFeedItem_clicked(QTreeWidgetItem *item)
 {
+    query->clear();
     feedBrowser->clear();
     QTextEdit output;
     request = "SELECT title, date, content, link FROM Feed WHERE title LIKE '%"
@@ -219,11 +221,22 @@ void MainWindow::on_actionAdd_triggered()
 
 void MainWindow::on_actionDelete_triggered()
 {
-
+    if (QApplication::focusWidget() == feedTreeWidget) {
+        int index = feedTreeWidget->currentIndex().row();
+        QString title = feedTreeWidget->takeTopLevelItem(index)->text(0);
+        request = "DELETE FROM Feed WHERE title LIKE '%" + title + "%'";
+        query->exec(request);
+    } else if (QApplication::focusWidget() == channelTreeWidget) {
+        int index = channelTreeWidget->currentIndex().row();
+        QString name = channelTreeWidget->takeTopLevelItem(index)->text(0);
+        request = "DELETE FROM Feed WHERE name LIKE '%" + name + "%'";
+        query->exec(request);
+    }
 }
 
 void MainWindow::on_actionUpdate_triggered()
 {
+    query->clear();
     request = "SELECT DISTINCT url FROM Feed";
     query->exec(request);
     QSqlRecord rec = query->record();

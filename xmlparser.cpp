@@ -96,6 +96,8 @@ QString XmlParser::extractAndParseDescription(QString description)
     currentExp.append("</a></p>");
     currentExp.append("<br");
     currentExp.append("/>");
+    currentExp.append("<div");
+    currentExp.append("/>");
     while (!currentExp.isEmpty()) {
         if (removeCurrentExp(&description, currentExp)) {
             continue;
