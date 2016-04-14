@@ -63,9 +63,9 @@ bool XmlParser::parseXml(QXmlStreamReader *xml, QUrl *url, QSqlQuery *query)
 
     QString request;
     foreach (Feed feed, feeds) {
-        request = "INSERT INTO Feed (name, url, title, category, content, date, link)"
+        request = "INSERT INTO Feed (name, url, title, category, content, date, link, unread)"
                   "VALUES (:stringName, :stringUrl, :stringTitle, :stringCategory, :stringContent,"
-                  "DATETIME(:stringDate), :stringLink)";
+                  "DATETIME(:stringDate), :stringLink, :intUnread)";
         query->prepare(request);
         query->bindValue(":stringName", channelTitle.trimmed());
         query->bindValue(":stringUrl", url->toString());
@@ -74,6 +74,7 @@ bool XmlParser::parseXml(QXmlStreamReader *xml, QUrl *url, QSqlQuery *query)
         query->bindValue(":stringContent", feed.getContent().trimmed());
         query->bindValue(":stringDate", feed.getDate().trimmed());
         query->bindValue(":stringLink", feed.getLink().trimmed());
+        query->bindValue(":intUnread", 1);
         query->exec();
     }
 

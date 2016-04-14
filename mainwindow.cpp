@@ -24,15 +24,17 @@ MainWindow::MainWindow(QWidget *parent) :
 
     feedBrowser->setOpenLinks(false);
 
-    feedTreeWidget->setColumnCount(3);
-    QStringList headerLabelsList;
-    headerLabelsList.push_back("Title");
-    headerLabelsList.push_back("Category");
-    headerLabelsList.push_back("Date");
-    feedTreeWidget->setHeaderLabels(headerLabelsList);
+    feedTreeWidget->setColumnCount(4);
+    QTreeWidgetItem *headerItem = new QTreeWidgetItem;
+    headerItem->setIcon(0, QIcon(":/img/readHeader.png"));
+    headerItem->setText(1, "Title");
+    headerItem->setText(2, "Category");
+    headerItem->setText(3, "Date");
+    feedTreeWidget->setHeaderItem(headerItem);
     feedTreeWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    feedTreeWidget->setIndentation(0);
     feedTreeWidget->setSortingEnabled(true);
-    feedTreeWidget->sortItems(2, Qt::DescendingOrder);
+    feedTreeWidget->sortItems(3, Qt::DescendingOrder);
 
     channelTreeWidget->setColumnCount(1);
     channelTreeWidget->setHeaderLabel("Channel");
@@ -51,20 +53,26 @@ MainWindow::MainWindow(QWidget *parent) :
     mainPanel->setLayout(hBoxLayout);
     setCentralWidget(mainPanel);
 
-    connect(this, SIGNAL(feedFound()), this, SLOT(addFeedsToDatabase()));
-    connect(this, SIGNAL(readyForUpdate()), this, SLOT(updateChannelInfo()));
+    connect(this, SIGNAL(feedsFound()), this, SLOT(addFeedsToDatabase()));
+    connect(this, SIGNAL(readyForUpdateChannels()), this, SLOT(updateChannelsInfo()));
     connect(channelTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this,
             SLOT(onChannelItem_clicked(QTreeWidgetItem*)));
     connect(feedTreeWidget, SIGNAL(itemClicked(QTreeWidgetItem*, int)), this,
             SLOT(onFeedItem_clicked(QTreeWidgetItem*)));
-    connect(feedBrowser, SIGNAL(anchorClicked(QUrl)), this, SLOT(onRSSLink_clicked(QUrl)));
-    connect(this, SIGNAL(getFeed()), this, SLOT(downloadFeed()));
-    connect(fileDownloader, SIGNAL(downloaded()), this, SLOT(feedIsDownloaded()));
-    connect(this, SIGNAL(checkUrlForDownload()), this, SLOT(checkUrlForDownloading()));
+    connect(feedTreeWidget, SIGNAL(itemPressed(QTreeWidgetItem*,int)), this,
+            SLOT(onFeedItem_clicked(QTreeWidgetItem*)));
+    connect(feedBrowser, SIGNAL(anchorClicked(QUrl)), this, SLOT(onRssLink_clicked(QUrl)));
+    connect(this, SIGNAL(getFeeds()), this, SLOT(downloadFeeds()));
+    connect(fileDownloader, SIGNAL(downloaded()), this, SLOT(feedsIsDownloaded()));
+    connect(this, SIGNAL(checkUrlListForUpdatingChannels()), this, SLOT(checkUrlListForGetFeeds()));
     connect(timer, SIGNAL(timeout()), this, SLOT(on_actionUpdate_triggered()));
+    connect(channelTreeWidget, SIGNAL(itemActivated(QTreeWidgetItem*,int)), this,
+            SLOT(onChannelItem_clicked(QTreeWidgetItem*)));
+    connect(feedTreeWidget, SIGNAL(itemActivated(QTreeWidgetItem*,int)), this,
+            SLOT(onFeedItem_clicked(QTreeWidgetItem*)));
     timer->start(UPDATE_FREQUENCY);
     setupDatabase();
-    updateChannelInfo();
+    updateChannelsInfo();
 }
 
 MainWindow::~MainWindow()
@@ -96,7 +104,7 @@ void MainWindow::setupDatabase()
     query = new QSqlQuery;
     request = "CREATE TABLE IF NOT EXISTS Feed (name VARCHAR, url VARCHAR,"
               "title VARCHAR UNIQUE NOT NULL, category VARCHAR, content VARCHAR, date DATETIME,"
-              "link VARCHAR, CONSTRAINT Feed PRIMARY KEY (title))";
+              "link VARCHAR, unread INTEGER, CONSTRAINT Feed PRIMARY KEY (title))";
     query->exec(request);
 }
 
@@ -113,36 +121,35 @@ void MainWindow::parseXml()
 void MainWindow::addFeedsToDatabase()
 {
     parseXml();
-    emit readyForUpdate();
+    emit readyForUpdateChannels();
 }
 
-void MainWindow::checkUrlForDownloading()
+void MainWindow::checkUrlListForGetFeeds()
 {
     if (fileDownloader->isUrlForDownloadEmpty()) {
-        feedTreeWidget->clear();
-        request = "SELECT title, category, date FROM Feed WHERE name LIKE '%"
+        request = "SELECT title, category, date, unread FROM Feed WHERE name LIKE '%"
                 + currentChannelName + "%'";
         updateFeedsInfo();
         return;
     }
-    emit getFeed();
+    emit getFeeds();
 }
 
-void MainWindow::downloadFeed()
+void MainWindow::downloadFeeds()
 {
     fileDownloader->downloadData();
 }
 
-void MainWindow::feedIsDownloaded()
+void MainWindow::feedsIsDownloaded()
 {
     xmlReader->addData(fileDownloader->getDownloadedData());
     url->setUrl(fileDownloader->getCurrentUrl());
     parseXml();
-    emit checkUrlForDownload();
+    emit checkUrlListForUpdatingChannels();
 }
 
 
-void MainWindow::updateChannelInfo()
+void MainWindow::updateChannelsInfo()
 {
     query->clear();
     channelTreeWidget->clear();
@@ -165,9 +172,14 @@ void MainWindow::updateFeedsInfo()
     QSqlRecord rec = query->record();
     while (query->next()) {
         QTreeWidgetItem* feedTreeWidgetItem = new QTreeWidgetItem;
-        feedTreeWidgetItem->setText(0, query->value(rec.indexOf("title")).toString());
-        feedTreeWidgetItem->setText(1, query->value(rec.indexOf("category")).toString());
-        feedTreeWidgetItem->setText(2, query->value(rec.indexOf("date")).toString());
+        if (query->value(rec.indexOf("unread")).toInt() == 1) {
+            feedTreeWidgetItem->setIcon(0, QIcon(":/img/unread.png"));
+        } else {
+            feedTreeWidgetItem->setIcon(0, QIcon(":/img/read.png"));
+        }
+        feedTreeWidgetItem->setText(1, query->value(rec.indexOf("title")).toString());
+        feedTreeWidgetItem->setText(2, query->value(rec.indexOf("category")).toString());
+        feedTreeWidgetItem->setText(3, query->value(rec.indexOf("date")).toString());
         feedTreeWidget->addTopLevelItem(feedTreeWidgetItem);
     }
     for (int i = 0; i < feedTreeWidget->columnCount(); i++) {
@@ -175,14 +187,23 @@ void MainWindow::updateFeedsInfo()
     }
 }
 
+void MainWindow::feedIsRead(QTreeWidgetItem *item)
+{
+    QString title = item->text(1);
+    request = "UPDATE Feed SET unread = NULL WHERE title = :stringTitle";
+    query->prepare(request);
+    query->bindValue(":stringTitle", title);
+    query->exec();
+    item->setIcon(0, QIcon(":/img/read.png"));
+}
+
 void MainWindow::onChannelItem_clicked(QTreeWidgetItem *item)
 {
-    feedTreeWidget->clear();
     currentChannelName = item->text(0);
-    request = "SELECT title, category, date FROM Feed WHERE name LIKE '%"
+    request = "SELECT title, category, date, unread FROM Feed WHERE name LIKE '%"
             + currentChannelName + "%'";
     updateFeedsInfo();
-    feedTreeWidget->sortItems(2, Qt::DescendingOrder);
+    feedTreeWidget->sortItems(3, Qt::DescendingOrder);
 }
 
 void MainWindow::onFeedItem_clicked(QTreeWidgetItem *item)
@@ -190,8 +211,9 @@ void MainWindow::onFeedItem_clicked(QTreeWidgetItem *item)
     query->clear();
     feedBrowser->clear();
     QTextEdit output;
+    QString title = item->text(1).replace("'", "''");
     request = "SELECT title, date, content, link FROM Feed WHERE title LIKE '%"
-            + item->text(0).replace("'", "''") + "%'";
+            + title + "%'";
     query->exec(request);
     QSqlRecord rec = query->record();
     while (query->next()) {
@@ -202,9 +224,10 @@ void MainWindow::onFeedItem_clicked(QTreeWidgetItem *item)
                                      + tr("Read more here") + "</a>"));
     }
     feedBrowser->setHtml(output.toHtml());
+    feedIsRead(item);
 }
 
-void MainWindow::onRSSLink_clicked(QUrl url)
+void MainWindow::onRssLink_clicked(QUrl url)
 {
     QDesktopServices::openUrl(url);
 }
@@ -215,7 +238,7 @@ void MainWindow::on_actionAdd_triggered()
     if (searchDialog.exec() == QDialog::Accepted) {
         *url = searchDialog.getFeedUrl();
         xmlReader->addData(searchDialog.getDownloadedData());
-        emit feedFound();
+        emit feedsFound();
     }
 }
 
@@ -223,12 +246,12 @@ void MainWindow::on_actionDelete_triggered()
 {
     if (QApplication::focusWidget() == feedTreeWidget) {
         int index = feedTreeWidget->currentIndex().row();
-        QString title = feedTreeWidget->takeTopLevelItem(index)->text(0);
+        QString title = feedTreeWidget->takeTopLevelItem(index)->text(1);
         request = "DELETE FROM Feed WHERE title LIKE '%" + title + "%'";
         query->exec(request);
     } else if (QApplication::focusWidget() == channelTreeWidget) {
         int index = channelTreeWidget->currentIndex().row();
-        QString name = channelTreeWidget->takeTopLevelItem(index)->text(0);
+        QString name = channelTreeWidget->takeTopLevelItem(index)->text(1);
         request = "DELETE FROM Feed WHERE name LIKE '%" + name + "%'";
         query->exec(request);
     }
@@ -236,6 +259,9 @@ void MainWindow::on_actionDelete_triggered()
 
 void MainWindow::on_actionUpdate_triggered()
 {
+    if (!fileDownloader->isUrlForDownloadEmpty()) {
+        return;
+    }
     query->clear();
     request = "SELECT DISTINCT url FROM Feed";
     query->exec(request);
@@ -243,10 +269,25 @@ void MainWindow::on_actionUpdate_triggered()
     while (query->next()) {
         fileDownloader->addUrlForDownload(query->value(rec.indexOf("url")).toString());
     }
-    emit checkUrlForDownload();
+    emit checkUrlListForUpdatingChannels();
 }
 
 void MainWindow::on_actionExit_triggered()
 {
     close();
+}
+
+void MainWindow::on_actionShow_all_feeds_triggered()
+{
+    request = "SELECT title, category, date, unread FROM Feed WHERE name LIKE '%"
+            + currentChannelName + "%'";
+    updateFeedsInfo();
+}
+
+
+void MainWindow::on_actionShow_only_unread_feeds_triggered()
+{
+    request = "SELECT title, category, date, unread FROM Feed WHERE name LIKE '%"
+            + currentChannelName + "%' AND unread = '1'";
+    updateFeedsInfo();
 }

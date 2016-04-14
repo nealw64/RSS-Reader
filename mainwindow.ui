@@ -30,6 +30,9 @@
     <addaction name="actionAdd"/>
     <addaction name="actionUpdate"/>
     <addaction name="actionDelete"/>
+    <addaction name="separator"/>
+    <addaction name="actionShow_all_feeds"/>
+    <addaction name="actionShow_only_unread_feeds"/>
    </widget>
    <widget class="QMenu" name="menuFile">
     <property name="title">
@@ -70,6 +73,22 @@
    </property>
    <property name="shortcut">
     <string>Del</string>
+   </property>
+  </action>
+  <action name="actionShow_all_feeds">
+   <property name="text">
+    <string>Show all feeds</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionShow_only_unread_feeds">
+   <property name="text">
+    <string>Show only unread feeds</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+U</string>
    </property>
   </action>
  </widget>

@@ -1,5 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file>img/windowIcon.png</file>
+	<file>img/readHeader.png</file>
+	<file>img/read.png</file>
+	<file>img/unread.png</file>
     </qresource>
 </RCC>

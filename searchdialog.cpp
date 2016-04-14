@@ -7,12 +7,12 @@ SearchDialog::SearchDialog(QWidget *parent) :
     searchInput = new QLineEdit;
     searchButton = new QPushButton;
     searchButton->setText(tr("Search"));
-    messageLabel = new QLabel;
+    messageLabel = new QLabel("Enter the link on RSS-Channel");
 
     gridLayout = new QGridLayout;
     gridLayout->addWidget(searchInput, 0, 0);
     gridLayout->addWidget(searchButton, 0, 1);
-    gridLayout->addWidget(messageLabel);
+    gridLayout->addWidget(messageLabel, 1, 0);
     setLayout(gridLayout);
     setMinimumSize(400, 60);
 
@@ -39,7 +39,7 @@ void SearchDialog::isValidUrl()
         messageLabel->setText(tr("All right. URL is valid."));
         emit validUrl();
     } else {
-        messageLabel->setText(tr("Invalid URL"));
+        messageLabel->setText(tr("Invalid URL. Please, enter the valid URL."));
     }
 }
 

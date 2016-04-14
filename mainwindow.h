@@ -26,25 +26,28 @@ public:
     void parseXml();
 
 signals:
-    void feedFound();
-    void getFeed();
-    void readyForUpdate();
-    void checkUrlForDownload();
+    void feedsFound();
+    void getFeeds();
+    void readyForUpdateChannels();
+    void checkUrlListForUpdatingChannels();
 
 private slots:
-    void checkUrlForDownloading();
-    void downloadFeed();
-    void feedIsDownloaded();
+    void checkUrlListForGetFeeds();
+    void downloadFeeds();
+    void feedsIsDownloaded();
     void addFeedsToDatabase();
-    void updateChannelInfo();
+    void updateChannelsInfo();
     void updateFeedsInfo();
-    void on_actionAdd_triggered();  
+    void feedIsRead(QTreeWidgetItem *item);
+    void on_actionAdd_triggered();
     void on_actionDelete_triggered();
     void on_actionExit_triggered();
     void on_actionUpdate_triggered();
     void onChannelItem_clicked(QTreeWidgetItem *item);
     void onFeedItem_clicked(QTreeWidgetItem *item);
-    void onRSSLink_clicked(QUrl url);
+    void onRssLink_clicked(QUrl url);
+    void on_actionShow_all_feeds_triggered();
+    void on_actionShow_only_unread_feeds_triggered();
 
 private:
     Ui::MainWindow *ui;
