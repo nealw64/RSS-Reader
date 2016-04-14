@@ -6,6 +6,7 @@
 #include <QTreeWidget>
 #include <QVBoxLayout>
 #include <QtSql>
+#include <QMessageBox>
 #include <QtWidgets>
 #include "searchdialog.h"
 #include "xmlparser.h"
@@ -48,6 +49,8 @@ private slots:
     void onRssLink_clicked(QUrl url);
     void on_actionShow_all_feeds_triggered();
     void on_actionShow_only_unread_feeds_triggered();
+
+    void on_actionFull_screen_triggered();
 
 private:
     Ui::MainWindow *ui;

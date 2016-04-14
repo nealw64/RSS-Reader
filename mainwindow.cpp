@@ -210,20 +210,21 @@ void MainWindow::onFeedItem_clicked(QTreeWidgetItem *item)
 {
     query->clear();
     feedBrowser->clear();
-    QTextEdit output;
     QString title = item->text(1).replace("'", "''");
     request = "SELECT title, date, content, link FROM Feed WHERE title LIKE '%"
             + title + "%'";
     query->exec(request);
     QSqlRecord rec = query->record();
     while (query->next()) {
-        output.append(query->value(rec.indexOf("title")).toString());
-        output.append(query->value(rec.indexOf("date")).toString());
-        output.append(query->value(rec.indexOf("content")).toString());
-        output.append("<a href='" + (query->value(rec.indexOf("link")).toString() + "'>"
-                                     + tr("Read more here") + "</a>"));
+        feedBrowser->append("<html><body><font size = '6'><b>"
+                            + query->value(rec.indexOf("title")).toString()+ "</b></font><br>"
+                            + "<font size = '4'><i><br>"
+                            + query->value(rec.indexOf("date")).toString() + "</i></font><br>"
+                            + "<p><font size = '5'"
+                            + query->value(rec.indexOf("content")).toString() + "</font></p>"
+                            + "<br><a href='" + (query->value(rec.indexOf("link")).toString() + "'>"
+                            + tr("Read more here") + "</a></body></html>"));
     }
-    feedBrowser->setHtml(output.toHtml());
     feedIsRead(item);
 }
 
@@ -251,9 +252,12 @@ void MainWindow::on_actionDelete_triggered()
         query->exec(request);
     } else if (QApplication::focusWidget() == channelTreeWidget) {
         int index = channelTreeWidget->currentIndex().row();
-        QString name = channelTreeWidget->takeTopLevelItem(index)->text(1);
+        QString name = channelTreeWidget->takeTopLevelItem(index)->text(0);
         request = "DELETE FROM Feed WHERE name LIKE '%" + name + "%'";
         query->exec(request);
+        if (name == currentChannelName) {
+            feedTreeWidget->clear();
+        }
     }
 }
 
@@ -290,4 +294,9 @@ void MainWindow::on_actionShow_only_unread_feeds_triggered()
     request = "SELECT title, category, date, unread FROM Feed WHERE name LIKE '%"
             + currentChannelName + "%' AND unread = '1'";
     updateFeedsInfo();
+}
+
+void MainWindow::on_actionFull_screen_triggered()
+{
+    showMaximized();
 }

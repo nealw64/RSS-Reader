@@ -14,7 +14,7 @@ SearchDialog::SearchDialog(QWidget *parent) :
     gridLayout->addWidget(searchButton, 0, 1);
     gridLayout->addWidget(messageLabel, 1, 0);
     setLayout(gridLayout);
-    setMinimumSize(400, 60);
+    setMinimumSize(350, 60);
 
     connect(searchButton, SIGNAL(clicked(bool)), this, SLOT(isValidUrl()));
     connect(searchInput, SIGNAL(returnPressed()), this, SLOT(isValidUrl()));
@@ -57,7 +57,6 @@ void SearchDialog::searchFeed()
 {
     progressDialog = new QProgressDialog(tr("Downloading feeds..."), 0, 0, 100, this);
     progressDialog->setWindowTitle(tr("Downloading"));
-    progressDialog->setWindowModality(Qt::WindowModal);
 
     feedUrl.setUrl(searchInput->text());
     fileDownloader.addUrlForDownload(feedUrl);
