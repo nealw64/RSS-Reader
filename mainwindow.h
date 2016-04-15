@@ -8,7 +8,7 @@
 #include <QtSql>
 #include <QMessageBox>
 #include <QtWidgets>
-#include "searchdialog.h"
+#include "addfeedsdialog.h"
 #include "xmlparser.h"
 #include "filedownloader.h"
 #include "newsview.h"

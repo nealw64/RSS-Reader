@@ -127,8 +127,8 @@ void MainWindow::addFeedsToDatabase()
 void MainWindow::checkUrlListForGetFeeds()
 {
     if (fileDownloader->isUrlForDownloadEmpty()) {
-        request = "SELECT title, category, date, unread FROM Feed WHERE name LIKE '%"
-                + currentChannelName + "%'";
+        request = "SELECT title, category, date, unread FROM Feed WHERE name = '"
+                + currentChannelName + "'";
         updateFeedsInfo();
         return;
     }
@@ -200,8 +200,8 @@ void MainWindow::feedIsRead(QTreeWidgetItem *item)
 void MainWindow::onChannelItem_clicked(QTreeWidgetItem *item)
 {
     currentChannelName = item->text(0);
-    request = "SELECT title, category, date, unread FROM Feed WHERE name LIKE '%"
-            + currentChannelName + "%'";
+    request = "SELECT title, category, date, unread FROM Feed WHERE name = '"
+            + currentChannelName + "'";
     updateFeedsInfo();
     feedTreeWidget->sortItems(3, Qt::DescendingOrder);
 }
@@ -211,8 +211,7 @@ void MainWindow::onFeedItem_clicked(QTreeWidgetItem *item)
     query->clear();
     feedBrowser->clear();
     QString title = item->text(1).replace("'", "''");
-    request = "SELECT title, date, content, link FROM Feed WHERE title LIKE '%"
-            + title + "%'";
+    request = "SELECT title, date, content, link FROM Feed WHERE title = '" + title + "'";
     query->exec(request);
     NewsView::setContent(feedBrowser, query);
     feedIsRead(item);
@@ -225,9 +224,9 @@ void MainWindow::onRssLink_clicked(QUrl url)
 
 void MainWindow::on_actionAdd_triggered()
 {
-    SearchDialog searchDialog(this);
+    AddFeedsDialog searchDialog(this);
     if (searchDialog.exec() == QDialog::Accepted) {
-        *url = searchDialog.getFeedUrl();
+        *url = searchDialog.getFeedsUrl();
         xmlReader->addData(searchDialog.getDownloadedData());
         emit feedsFound();
     }
@@ -238,12 +237,12 @@ void MainWindow::on_actionDelete_triggered()
     if (QApplication::focusWidget() == feedTreeWidget) {
         int index = feedTreeWidget->currentIndex().row();
         QString title = feedTreeWidget->takeTopLevelItem(index)->text(1);
-        request = "DELETE FROM Feed WHERE title LIKE '%" + title + "%'";
+        request = "DELETE FROM Feed WHERE title = '" + title + "'";
         query->exec(request);
     } else if (QApplication::focusWidget() == channelTreeWidget) {
         int index = channelTreeWidget->currentIndex().row();
         QString name = channelTreeWidget->takeTopLevelItem(index)->text(0);
-        request = "DELETE FROM Feed WHERE name LIKE '%" + name + "%'";
+        request = "DELETE FROM Feed WHERE name = '" + name + "'";
         query->exec(request);
         if (name == currentChannelName) {
             feedTreeWidget->clear();
@@ -273,16 +272,16 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_actionShow_all_feeds_triggered()
 {
-    request = "SELECT title, category, date, unread FROM Feed WHERE name LIKE '%"
-            + currentChannelName + "%'";
+    request = "SELECT title, category, date, unread FROM Feed WHERE name = '"
+            + currentChannelName + "'";
     updateFeedsInfo();
 }
 
 
 void MainWindow::on_actionShow_only_unread_feeds_triggered()
 {
-    request = "SELECT title, category, date, unread FROM Feed WHERE name LIKE '%"
-            + currentChannelName + "%' AND unread = '1'";
+    request = "SELECT title, category, date, unread FROM Feed WHERE name = '"
+            + currentChannelName + "' AND unread = '1'";
     updateFeedsInfo();
 }
 

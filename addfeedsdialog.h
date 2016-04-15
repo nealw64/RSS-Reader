@@ -1,5 +1,5 @@
-#ifndef SEARCHDIALOG_H
-#define SEARCHDIALOG_H
+#ifndef ADDFEEDSDIALOG_H
+#define ADDFEEDSDIALOG_H
 
 #include <QDialog>
 #include <QProgressDialog>
@@ -11,27 +11,27 @@
 #include <QMessageBox>
 #include "filedownloader.h"
 
-class SearchDialog : public QDialog
+class AddFeedsDialog : public QDialog
 {
     Q_OBJECT
 public:
-    SearchDialog(QWidget *parent = 0);
-    ~SearchDialog();
-    QUrl getFeedUrl();
+    AddFeedsDialog(QWidget *parent = 0);
+    ~AddFeedsDialog();
+    QUrl getFeedsUrl();
     QByteArray getDownloadedData();
 
 signals:
     void validUrl();
 
 private slots:
-    void searchFeed();
+    void addFeeds();
     void updateDownloadProgress(qint64, qint64);
     void accepted();
     void isValidUrl();
 
 private:
-    QLineEdit *searchInput;
-    QPushButton *searchButton;
+    QLineEdit *linkInput;
+    QPushButton *addButton;
     QLabel *messageLabel;
     QGridLayout *gridLayout;
     QProgressDialog *progressDialog;
@@ -40,4 +40,4 @@ private:
     FileDownloader fileDownloader;
 };
 
-#endif // SEARCHDIALOG_H
+#endif // ADDFEEDSDIALOG_H

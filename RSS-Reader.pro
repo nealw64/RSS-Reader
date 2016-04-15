@@ -23,15 +23,15 @@ SOURCES += main.cpp\
         xmlparser.cpp \
         feed.cpp \
         filedownloader.cpp \
-        searchdialog.cpp \
-    newsview.cpp
+    newsview.cpp \
+    addfeedsdialog.cpp
 
 HEADERS  += mainwindow.h \
             xmlparser.h \
             feed.h \
             filedownloader.h \
-            searchdialog.h \
-    newsview.h
+    newsview.h \
+    addfeedsdialog.h
 
 FORMS    += mainwindow.ui
 
