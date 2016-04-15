@@ -20,17 +20,20 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    xmlparser.cpp \
-    feed.cpp \
-    filedownloader.cpp \
-    searchdialog.cpp
+        xmlparser.cpp \
+        feed.cpp \
+        filedownloader.cpp \
+        searchdialog.cpp \
+    newsview.cpp
 
 HEADERS  += mainwindow.h \
-    xmlparser.h \
-    feed.h \
-    filedownloader.h \
-    searchdialog.h
+            xmlparser.h \
+            feed.h \
+            filedownloader.h \
+            searchdialog.h \
+    newsview.h
 
 FORMS    += mainwindow.ui
 
-RESOURCES = images.qrc
+RESOURCES += images.qrc\
+             styles.qrc

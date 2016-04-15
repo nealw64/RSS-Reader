@@ -107,6 +107,8 @@ QString XmlParser::extractAndParseDescription(QString description)
             currentExp.removeFirst();
         }
     }
+    description.remove("<p>");
+    description.remove("</p>");
     return description;
 }
 

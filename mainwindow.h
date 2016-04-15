@@ -11,6 +11,7 @@
 #include "searchdialog.h"
 #include "xmlparser.h"
 #include "filedownloader.h"
+#include "newsview.h"
 
 namespace Ui {
 class MainWindow;

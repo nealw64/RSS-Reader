@@ -214,17 +214,7 @@ void MainWindow::onFeedItem_clicked(QTreeWidgetItem *item)
     request = "SELECT title, date, content, link FROM Feed WHERE title LIKE '%"
             + title + "%'";
     query->exec(request);
-    QSqlRecord rec = query->record();
-    while (query->next()) {
-        feedBrowser->append("<html><body><font size = '6'><b>"
-                            + query->value(rec.indexOf("title")).toString()+ "</b></font><br>"
-                            + "<font size = '4'><i><br>"
-                            + query->value(rec.indexOf("date")).toString() + "</i></font><br>"
-                            + "<p><font size = '5'"
-                            + query->value(rec.indexOf("content")).toString() + "</font></p>"
-                            + "<br><a href='" + (query->value(rec.indexOf("link")).toString() + "'>"
-                            + tr("Read more here") + "</a></body></html>"));
-    }
+    NewsView::setContent(feedBrowser, query);
     feedIsRead(item);
 }
 
