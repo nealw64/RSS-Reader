@@ -64,6 +64,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(feedBrowser, SIGNAL(anchorClicked(QUrl)), this, SLOT(onRssLink_clicked(QUrl)));
     connect(this, SIGNAL(getFeeds()), this, SLOT(downloadFeeds()));
     connect(fileDownloader, SIGNAL(downloaded()), this, SLOT(feedsIsDownloaded()));
+    connect(fileDownloader, SIGNAL(replyError(QString)), this, SLOT(updateFeedsFailed(QString)));
     connect(this, SIGNAL(checkUrlListForUpdatingChannels()), this, SLOT(checkUrlListForGetFeeds()));
     connect(timer, SIGNAL(timeout()), this, SLOT(on_actionUpdate_triggered()));
     connect(channelTreeWidget, SIGNAL(itemActivated(QTreeWidgetItem*,int)), this,
@@ -185,6 +186,11 @@ void MainWindow::updateFeedsInfo()
     for (int i = 0; i < feedTreeWidget->columnCount(); i++) {
         feedTreeWidget->resizeColumnToContents(i);
     }
+}
+
+void MainWindow::updateFeedsFailed(QString error)
+{
+    QMessageBox::warning(this, tr("Error"), error, QMessageBox::Ok);
 }
 
 void MainWindow::feedIsRead(QTreeWidgetItem *item)

@@ -28,6 +28,7 @@ private slots:
     void updateDownloadProgress(qint64, qint64);
     void accepted();
     void isValidUrl();
+    void addFeedsFailed(QString);
 
 private:
     QLineEdit *linkInput;

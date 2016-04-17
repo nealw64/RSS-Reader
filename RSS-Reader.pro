@@ -9,8 +9,6 @@ QT       += core\
             sql\
             network\
             xml\
-            webkit \
-            webkitwidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -23,15 +21,15 @@ SOURCES += main.cpp\
         xmlparser.cpp \
         feed.cpp \
         filedownloader.cpp \
-    newsview.cpp \
-    addfeedsdialog.cpp
+        newsview.cpp \
+        addfeedsdialog.cpp
 
 HEADERS  += mainwindow.h \
             xmlparser.h \
             feed.h \
             filedownloader.h \
-    newsview.h \
-    addfeedsdialog.h
+            newsview.h \
+            addfeedsdialog.h
 
 FORMS    += mainwindow.ui
 

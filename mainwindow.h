@@ -40,6 +40,7 @@ private slots:
     void addFeedsToDatabase();
     void updateChannelsInfo();
     void updateFeedsInfo();
+    void updateFeedsFailed(QString);
     void feedIsRead(QTreeWidgetItem *item);
     void on_actionAdd_triggered();
     void on_actionDelete_triggered();
@@ -50,7 +51,6 @@ private slots:
     void onRssLink_clicked(QUrl url);
     void on_actionShow_all_feeds_triggered();
     void on_actionShow_only_unread_feeds_triggered();
-
     void on_actionFull_screen_triggered();
 
 private:

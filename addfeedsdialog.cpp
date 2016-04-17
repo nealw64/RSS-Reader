@@ -14,12 +14,13 @@ AddFeedsDialog::AddFeedsDialog(QWidget *parent) :
     gridLayout->addWidget(addButton, 0, 1);
     gridLayout->addWidget(messageLabel, 1, 0);
     setLayout(gridLayout);
-    setMinimumSize(350, 60);
+    setMinimumSize(400, 60);
 
     connect(addButton, SIGNAL(clicked(bool)), this, SLOT(isValidUrl()));
     connect(linkInput, SIGNAL(returnPressed()), this, SLOT(isValidUrl()));
     connect(this, SIGNAL(validUrl()), this, SLOT(addFeeds()));
     connect(&fileDownloader, SIGNAL(downloaded()), this, SLOT(accepted()));
+    connect(&fileDownloader, SIGNAL(replyError(QString)), this, SLOT(addFeedsFailed(QString)));
 }
 
 AddFeedsDialog::~AddFeedsDialog()
@@ -36,10 +37,9 @@ void AddFeedsDialog::isValidUrl()
     regex = "^(http|https|ftp):\\/\\/[a-z0-9]+([-.]{1}[a-z0-9]+)*.[a-z]{2,5}(([0-9]{1,5})?\\/?.*)$";
     QRegExp validUrlRegex(regex);
     if (validUrlRegex.exactMatch(linkInput->text())) {
-        messageLabel->setText(tr("All right. URL is valid."));
         emit validUrl();
     } else {
-        messageLabel->setText(tr("Invalid URL. Please, enter the valid URL."));
+        messageLabel->setText(tr("Invalid feed-adress. Please, enter the valid feed-adress."));
     }
 }
 
@@ -60,8 +60,8 @@ void AddFeedsDialog::addFeeds()
 
     feedUrl.setUrl(linkInput->text());
     fileDownloader.addUrlForDownload(feedUrl);
-    progressDialog->show();
     fileDownloader.downloadData();
+    progressDialog->show();
 
     connect(&fileDownloader, SIGNAL(downloadProgress(qint64, qint64)), this,
             SLOT(updateDownloadProgress(qint64, qint64)));
@@ -73,9 +73,14 @@ void AddFeedsDialog::updateDownloadProgress(qint64 bytesRead, qint64 totalBytes)
     progressDialog->setValue(bytesRead);
 }
 
+void AddFeedsDialog::addFeedsFailed(QString error)
+{
+    progressDialog->close();
+    QMessageBox::warning(this, tr("Error"), error, QMessageBox::Ok);
+}
+
 void AddFeedsDialog::accepted()
 {
     progressDialog->close();
-    delete progressDialog;
     accept();
 }
