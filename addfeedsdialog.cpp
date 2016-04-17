@@ -17,7 +17,6 @@ AddFeedsDialog::AddFeedsDialog(QWidget *parent) :
     setMinimumSize(400, 60);
 
     connect(addButton, SIGNAL(clicked(bool)), this, SLOT(isValidUrl()));
-    connect(linkInput, SIGNAL(returnPressed()), this, SLOT(isValidUrl()));
     connect(this, SIGNAL(validUrl()), this, SLOT(addFeeds()));
     connect(&fileDownloader, SIGNAL(downloaded()), this, SLOT(accepted()));
     connect(&fileDownloader, SIGNAL(replyError(QString)), this, SLOT(addFeedsFailed(QString)));

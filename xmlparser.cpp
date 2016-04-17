@@ -10,10 +10,10 @@ XmlParser::XmlParser()
     months.insert("Jun", "06");
     months.insert("Jul", "07");
     months.insert("Aug", "08");
-    months.insert("Sep", "09");
-    months.insert("Okt", "10");
+    months.insert("Sept", "09");
+    months.insert("Oct", "10");
     months.insert("Nov", "11");
-    months.insert("Des", "12");
+    months.insert("Dec", "12");
 }
 
 bool XmlParser::parseXml(QXmlStreamReader *xml, QUrl *url, QSqlQuery *query)
@@ -45,6 +45,7 @@ bool XmlParser::parseXml(QXmlStreamReader *xml, QUrl *url, QSqlQuery *query)
                 previousTag = "";
             } else if (currentTag == "title") {
                 title = xml->text().toString();
+                title.replace("&nbsp;", " ");
             } else if (currentTag == "category") {
                 category = xml->text().toString();
             } else if (currentTag == "description") {
@@ -78,6 +79,7 @@ bool XmlParser::parseXml(QXmlStreamReader *xml, QUrl *url, QSqlQuery *query)
         query->exec();
     }
 
+    feeds.clear();
     return true;
 }
 

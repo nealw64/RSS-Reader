@@ -103,9 +103,9 @@ void MainWindow::setupDatabase()
         exit(0);
     }
     query = new QSqlQuery;
-    request = "CREATE TABLE IF NOT EXISTS Feed (name VARCHAR, url VARCHAR,"
-              "title VARCHAR UNIQUE NOT NULL, category VARCHAR, content VARCHAR, date DATETIME,"
-              "link VARCHAR, unread INTEGER, CONSTRAINT Feed PRIMARY KEY (title))";
+    request = "CREATE TABLE IF NOT EXISTS Feed (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"
+              "name VARCHAR, url VARCHAR, title VARCHAR, category VARCHAR, content VARCHAR,"
+              "date DATETIME, link VARCHAR, unread INTEGER, UNIQUE(title, url, name))";
     query->exec(request);
 }
 
@@ -145,6 +145,7 @@ void MainWindow::feedsIsDownloaded()
 {
     xmlReader->addData(fileDownloader->getDownloadedData());
     url->setUrl(fileDownloader->getCurrentUrl());
+    query->clear();
     parseXml();
     emit checkUrlListForUpdatingChannels();
 }
@@ -196,9 +197,10 @@ void MainWindow::updateFeedsFailed(QString error)
 void MainWindow::feedIsRead(QTreeWidgetItem *item)
 {
     QString title = item->text(1);
-    request = "UPDATE Feed SET unread = NULL WHERE title = :stringTitle";
+    request = "UPDATE Feed SET unread = NULL WHERE title = :stringTitle AND name = :stringName";
     query->prepare(request);
     query->bindValue(":stringTitle", title);
+    query->bindValue(":stringName", currentChannelName);
     query->exec();
     item->setIcon(0, QIcon(":/img/read.png"));
 }
@@ -243,7 +245,8 @@ void MainWindow::on_actionDelete_triggered()
     if (QApplication::focusWidget() == feedTreeWidget) {
         int index = feedTreeWidget->currentIndex().row();
         QString title = feedTreeWidget->takeTopLevelItem(index)->text(1);
-        request = "DELETE FROM Feed WHERE title = '" + title + "'";
+        request = "DELETE FROM Feed WHERE title = '" + title + "' AND name = '"
+                + currentChannelName + "'";
         query->exec(request);
     } else if (QApplication::focusWidget() == channelTreeWidget) {
         int index = channelTreeWidget->currentIndex().row();
