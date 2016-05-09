@@ -298,3 +298,11 @@ void MainWindow::on_actionFull_screen_triggered()
 {
     showMaximized();
 }
+
+void MainWindow::on_actionAbout_triggered()
+{
+    QMessageBox::information(this, tr("About RSS-Reader"),
+                             tr("RSS-Reader was written by George Kovalenko as a course project.\n"
+                                                              "BSUIR, 2016."),
+                                 QMessageBox::Ok);
+}
