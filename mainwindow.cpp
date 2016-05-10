@@ -131,6 +131,9 @@ void MainWindow::checkUrlListForGetFeeds()
         request = "SELECT title, category, date, unread FROM Feed WHERE name = '"
                 + currentChannelName + "'";
         updateFeedsInfo();
+        updateChannelsInfo();
+        QMessageBox::information(this, tr("Information"),
+                                 tr("Latest news loaded and ready to read."), QMessageBox::Ok);
         return;
     }
     emit getFeeds();
@@ -155,13 +158,13 @@ void MainWindow::updateChannelsInfo()
 {
     query->clear();
     channelTreeWidget->clear();
-    request = "SELECT DISTINCT name FROM Feed";
+    request = "SELECT name, COUNT(unread) AS unreadCount FROM Feed GROUP BY name";
     query->exec(request);
     QSqlRecord rec = query->record();
-    while (query->next())
-    {
+    while (query->next()) {
         QTreeWidgetItem *channelTreeWidgetItem = new QTreeWidgetItem;
-        channelTreeWidgetItem->setText(0, query->value(rec.indexOf("name")).toString());
+        channelTreeWidgetItem->setText(0, query->value(rec.indexOf("name")).toString() + " ("
+                                       + query->value(rec.indexOf("unreadCount")).toString() + ")");
         channelTreeWidget->addTopLevelItem(channelTreeWidgetItem);
     }
 }
@@ -203,11 +206,14 @@ void MainWindow::feedIsRead(QTreeWidgetItem *item)
     query->bindValue(":stringName", currentChannelName);
     query->exec();
     item->setIcon(0, QIcon(":/img/read.png"));
+    updateChannelsInfo();
 }
 
 void MainWindow::onChannelItem_clicked(QTreeWidgetItem *item)
 {
     currentChannelName = item->text(0);
+    currentChannelName.remove(QRegExp("\\([^\\)]+\\)"));
+    currentChannelName.remove(QRegExp("(\\s*$)"));
     request = "SELECT title, category, date, unread FROM Feed WHERE name = '"
             + currentChannelName + "'";
     updateFeedsInfo();
@@ -248,6 +254,7 @@ void MainWindow::on_actionDelete_triggered()
         request = "DELETE FROM Feed WHERE title = '" + title + "' AND name = '"
                 + currentChannelName + "'";
         query->exec(request);
+        updateChannelsInfo();
     } else if (QApplication::focusWidget() == channelTreeWidget) {
         int index = channelTreeWidget->currentIndex().row();
         QString name = channelTreeWidget->takeTopLevelItem(index)->text(0);
@@ -303,6 +310,5 @@ void MainWindow::on_actionAbout_triggered()
 {
     QMessageBox::information(this, tr("About RSS-Reader"),
                              tr("RSS-Reader was written by George Kovalenko as a course project.\n"
-                                                              "BSUIR, 2016."),
-                                 QMessageBox::Ok);
+                                                              "BSUIR, 2016."), QMessageBox::Ok);
 }

@@ -52,7 +52,6 @@ private slots:
     void on_actionShow_all_feeds_triggered();
     void on_actionShow_only_unread_feeds_triggered();
     void on_actionFull_screen_triggered();
-
     void on_actionAbout_triggered();
 
 private:
