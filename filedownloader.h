@@ -9,9 +9,9 @@ class FileDownloader: public QObject
 public:
     explicit FileDownloader(QObject *parent = 0);
     ~FileDownloader();
-    QByteArray getDownloadedData() const;
+    QByteArray getDownloadedData();
     void downloadData();
-    void addUrlForDownload(QUrl url);
+    void addUrlForDownload(QString url);
     QString getCurrentUrl();
     bool isUrlForDownloadEmpty();
 

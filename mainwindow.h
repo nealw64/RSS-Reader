@@ -40,8 +40,9 @@ private slots:
     void addFeedsToDatabase();
     void updateChannelsInfo();
     void updateFeedsInfo();
-    void updateFeedsFailed(QString);
+    void updateFeedsFailed(QString error);
     void feedIsRead(QTreeWidgetItem *item);
+    void setHtmlPage(QString page);
     void on_actionAdd_triggered();
     void on_actionDelete_triggered();
     void on_actionExit_triggered();
@@ -66,6 +67,7 @@ private:
     QTreeWidget *feedTreeWidget;
     QTreeWidget *channelTreeWidget;
     QTextBrowser *feedBrowser;
+    NewsView *newsView;
     QWidget *feedPanel;
     QWidget *mainPanel;
     QString request;

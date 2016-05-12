@@ -13,7 +13,6 @@ public:
     bool parseXml(QXmlStreamReader *xml, QUrl* url, QSqlQuery* query);
     QString extractAndParseDate(QString pubDate);
     QString extractAndParseDescription(QString description);
-    bool removeCurrentExp(QString *description, QStringList currentExp);
 
 private:
     QString currentTag;

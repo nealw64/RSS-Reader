@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     feedTreeWidget = new QTreeWidget;
     channelTreeWidget = new QTreeWidget;
     feedBrowser = new QTextBrowser;
+    newsView = new NewsView;
     feedPanel = new QWidget;
     mainPanel = new QWidget;
     fileDownloader = new FileDownloader;
@@ -71,6 +72,7 @@ MainWindow::MainWindow(QWidget *parent) :
             SLOT(onChannelItem_clicked(QTreeWidgetItem*)));
     connect(feedTreeWidget, SIGNAL(itemActivated(QTreeWidgetItem*,int)), this,
             SLOT(onFeedItem_clicked(QTreeWidgetItem*)));
+    connect(newsView, SIGNAL(pageIsReady(QString)), this, SLOT(setHtmlPage(QString)));
     timer->start(UPDATE_FREQUENCY);
     setupDatabase();
     updateChannelsInfo();
@@ -128,8 +130,7 @@ void MainWindow::addFeedsToDatabase()
 void MainWindow::checkUrlListForGetFeeds()
 {
     if (fileDownloader->isUrlForDownloadEmpty()) {
-        request = "SELECT title, category, date, unread FROM Feed WHERE name = '"
-                + currentChannelName + "'";
+        request = "SELECT title, category, date, unread FROM Feed WHERE name = :stringName";
         updateFeedsInfo();
         updateChannelsInfo();
         QMessageBox::information(this, tr("Information"),
@@ -173,7 +174,9 @@ void MainWindow::updateFeedsInfo()
 {
     query->clear();
     feedTreeWidget->clear();
-    query->exec(request);
+    query->prepare(request);
+    query->bindValue(":stringName", currentChannelName);
+    query->exec();
     QSqlRecord rec = query->record();
     while (query->next()) {
         QTreeWidgetItem* feedTreeWidgetItem = new QTreeWidgetItem;
@@ -214,8 +217,7 @@ void MainWindow::onChannelItem_clicked(QTreeWidgetItem *item)
     currentChannelName = item->text(0);
     currentChannelName.remove(QRegExp("\\([^\\)]+\\)"));
     currentChannelName.remove(QRegExp("(\\s*$)"));
-    request = "SELECT title, category, date, unread FROM Feed WHERE name = '"
-            + currentChannelName + "'";
+    request = "SELECT title, category, date, unread FROM Feed WHERE name = :stringName";
     updateFeedsInfo();
     feedTreeWidget->sortItems(3, Qt::DescendingOrder);
 }
@@ -224,11 +226,18 @@ void MainWindow::onFeedItem_clicked(QTreeWidgetItem *item)
 {
     query->clear();
     feedBrowser->clear();
-    QString title = item->text(1).replace("'", "''");
-    request = "SELECT title, date, content, link FROM Feed WHERE title = '" + title + "'";
-    query->exec(request);
-    NewsView::setContent(feedBrowser, query);
+    QString title = item->text(1);
+    request = "SELECT title, date, content, link FROM Feed WHERE title = :stringTitle";
+    query->prepare(request);
+    query->bindValue(":stringTitle", title);
+    query->exec();
+    newsView->getContent(query);
     feedIsRead(item);
+}
+
+void MainWindow::setHtmlPage(QString page)
+{
+    feedBrowser->setText(page);
 }
 
 void MainWindow::onRssLink_clicked(QUrl url)
@@ -251,15 +260,21 @@ void MainWindow::on_actionDelete_triggered()
     if (QApplication::focusWidget() == feedTreeWidget) {
         int index = feedTreeWidget->currentIndex().row();
         QString title = feedTreeWidget->takeTopLevelItem(index)->text(1);
-        request = "DELETE FROM Feed WHERE title = '" + title + "' AND name = '"
-                + currentChannelName + "'";
-        query->exec(request);
+        request = "DELETE FROM Feed WHERE title = :stringTitle AND name = :stringName";
+        query->prepare(request);
+        query->bindValue(":stringTitle", title);
+        query->bindValue(":stringName", currentChannelName);
+        query->exec();
         updateChannelsInfo();
     } else if (QApplication::focusWidget() == channelTreeWidget) {
         int index = channelTreeWidget->currentIndex().row();
         QString name = channelTreeWidget->takeTopLevelItem(index)->text(0);
-        request = "DELETE FROM Feed WHERE name = '" + name + "'";
-        query->exec(request);
+        name.remove(QRegExp("\\([^\\)]+\\)"));
+        name.remove(QRegExp("(\\s*$)"));
+        request = "DELETE FROM Feed WHERE name = :stringName";
+        query->prepare(request);
+        query->bindValue(":stringName", name);
+        query->exec();
         if (name == currentChannelName) {
             feedTreeWidget->clear();
         }
@@ -288,16 +303,15 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_actionShow_all_feeds_triggered()
 {
-    request = "SELECT title, category, date, unread FROM Feed WHERE name = '"
-            + currentChannelName + "'";
+    request = "SELECT title, category, date, unread FROM Feed WHERE name = :stringName";
     updateFeedsInfo();
 }
 
 
 void MainWindow::on_actionShow_only_unread_feeds_triggered()
 {
-    request = "SELECT title, category, date, unread FROM Feed WHERE name = '"
-            + currentChannelName + "' AND unread = '1'";
+    request = "SELECT title, category, date, unread FROM Feed WHERE name = :stringName"
+              " AND unread = '1'";
     updateFeedsInfo();
 }
 

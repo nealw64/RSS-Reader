@@ -58,7 +58,7 @@ void AddFeedsDialog::addFeeds()
     progressDialog->setWindowTitle(tr("Downloading"));
 
     feedUrl.setUrl(linkInput->text());
-    fileDownloader.addUrlForDownload(feedUrl);
+    fileDownloader.addUrlForDownload(feedUrl.toString());
     fileDownloader.downloadData();
     progressDialog->show();
 

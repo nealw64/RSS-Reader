@@ -22,9 +22,9 @@ void FileDownloader::downloadData()
             SIGNAL(downloadProgress(qint64, qint64)));
 }
 
-void FileDownloader::addUrlForDownload(QUrl url)
+void FileDownloader::addUrlForDownload(QString url)
 {
-    urlForDownload.append(url.toString());
+    urlForDownload.append(url);
 }
 
 bool FileDownloader::isUrlForDownloadEmpty()
@@ -49,7 +49,7 @@ void FileDownloader::fileDownloaded(QNetworkReply *reply)
     }
 }
 
-QByteArray FileDownloader::getDownloadedData() const
+QByteArray FileDownloader::getDownloadedData()
 {
     return downloadedData;
 }
