@@ -10,7 +10,7 @@ class XmlParser
 {
 public:
     XmlParser();
-    bool parseXml(QXmlStreamReader *xml, QUrl* url, QSqlQuery* query);
+    bool parseXml(QXmlStreamReader *xml, QUrl *url, QSqlQuery *query);
     QString extractAndParseDate(QString pubDate);
     QString extractAndParseDescription(QString description);
 

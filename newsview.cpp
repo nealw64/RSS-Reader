@@ -3,6 +3,7 @@
 NewsView::NewsView(QObject *parent): QObject(parent)
 {
     connect(&fileDownloader, SIGNAL(downloaded()), this, SLOT(imageDownloaded()));
+    connect(&fileDownloader, SIGNAL(networkError(QString)), this, SLOT(downloadFailed(QString)));
     connect(this, SIGNAL(imageSaved()), this, SLOT(setContent()));
     connect(this, SIGNAL(noImage()), this, SLOT(setContent()));
 }
@@ -44,8 +45,7 @@ void NewsView::downloadImage()
     }
     link.remove(0, ++indexFirst + currentExp.length());
     currentExp = " alt=";
-    int indexLast = link.indexOf(currentExp);
-    indexLast--;
+    int indexLast = link.indexOf(currentExp) - 1;
     link.remove(indexLast, link.size() - indexLast);
     fileDownloader.addUrlForDownload(link);
     fileDownloader.downloadData();
@@ -62,4 +62,10 @@ void NewsView::imageDownloaded()
     content.replace(fileDownloader.getCurrentUrl(), path);
     feed.setContent(content);
     emit imageSaved();
+}
+
+void NewsView::downloadFailed(QString error)
+{
+    qDebug() << error << endl;
+    emit noImage();
 }

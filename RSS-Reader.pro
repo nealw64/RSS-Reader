@@ -34,3 +34,5 @@ FORMS    += mainwindow.ui
 
 RESOURCES += images.qrc\
              styles.qrc
+
+DISTFILES +=

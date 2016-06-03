@@ -65,7 +65,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(feedBrowser, SIGNAL(anchorClicked(QUrl)), this, SLOT(onRssLink_clicked(QUrl)));
     connect(this, SIGNAL(getFeeds()), this, SLOT(downloadFeeds()));
     connect(fileDownloader, SIGNAL(downloaded()), this, SLOT(feedsIsDownloaded()));
-    connect(fileDownloader, SIGNAL(replyError(QString)), this, SLOT(updateFeedsFailed(QString)));
+    connect(fileDownloader, SIGNAL(networkError(QString)), this, SLOT(updateFeedsFailed(QString)));
     connect(this, SIGNAL(checkUrlListForUpdatingChannels()), this, SLOT(checkUrlListForGetFeeds()));
     connect(timer, SIGNAL(timeout()), this, SLOT(on_actionUpdate_triggered()));
     connect(channelTreeWidget, SIGNAL(itemActivated(QTreeWidgetItem*,int)), this,
@@ -91,6 +91,7 @@ MainWindow::~MainWindow()
     delete feedTreeWidget;
     delete channelTreeWidget;
     delete feedBrowser;
+    delete newsView;
     delete feedPanel;
     delete mainPanel;
 }
@@ -102,7 +103,7 @@ void MainWindow::setupDatabase()
     database.open();
     if (!database.isOpen()) {
         qDebug() << database.lastError().text();
-        exit(0);
+        exit(1);
     }
     query = new QSqlQuery;
     request = "CREATE TABLE IF NOT EXISTS Feed (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,"

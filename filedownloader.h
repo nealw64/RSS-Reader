@@ -18,7 +18,7 @@ public:
 signals:
     void downloaded();
     void downloadProgress(qint64, qint64);
-    void replyError(QString);
+    void networkError(QString);
 
 private slots:
     void fileDownloaded(QNetworkReply *reply);

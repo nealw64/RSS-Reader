@@ -40,13 +40,13 @@ QString FileDownloader::getCurrentUrl()
 void FileDownloader::fileDownloaded(QNetworkReply *reply)
 {
     if (reply->error()) {
-        emit replyError(reply->errorString());
+        emit networkError(reply->errorString());
         urlForDownload.clear();
     } else {
         downloadedData = reply->readAll();
-        reply->deleteLater();
         emit downloaded();
     }
+    reply->deleteLater();
 }
 
 QByteArray FileDownloader::getDownloadedData()

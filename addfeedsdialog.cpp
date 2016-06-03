@@ -19,7 +19,7 @@ AddFeedsDialog::AddFeedsDialog(QWidget *parent) :
     connect(addButton, SIGNAL(clicked(bool)), this, SLOT(isValidUrl()));
     connect(this, SIGNAL(validUrl()), this, SLOT(addFeeds()));
     connect(&fileDownloader, SIGNAL(downloaded()), this, SLOT(accepted()));
-    connect(&fileDownloader, SIGNAL(replyError(QString)), this, SLOT(addFeedsFailed(QString)));
+    connect(&fileDownloader, SIGNAL(networkError(QString)), this, SLOT(addFeedsFailed(QString)));
 }
 
 AddFeedsDialog::~AddFeedsDialog()
@@ -33,7 +33,7 @@ AddFeedsDialog::~AddFeedsDialog()
 void AddFeedsDialog::isValidUrl()
 {
     QString regex;
-    regex = "^(http|https|ftp):\\/\\/[a-z0-9]+([-.]{1}[a-z0-9]+)*.[a-z]{2,5}(([0-9]{1,5})?\\/?.*)$";
+    regex = "^(http|https):\\/\\/[a-z0-9]+([-.]{1}[a-z0-9]+)*.[a-z]{2,5}(([0-9]{1,5})?\\/?.*)$";
     QRegExp validUrlRegex(regex);
     if (validUrlRegex.exactMatch(linkInput->text())) {
         emit validUrl();

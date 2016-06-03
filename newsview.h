@@ -23,6 +23,7 @@ signals:
 private slots:
     void imageDownloaded();
     void setContent();
+    void downloadFailed(QString error);
 
 private:
     FileDownloader fileDownloader;
